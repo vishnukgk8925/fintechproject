@@ -171,7 +171,7 @@
 			},
 			"p_enddate": {
 				"type": "string",
-				"defaultValue": "2025-06-02"
+				"defaultValue": "2026-01-01"
 			},
 			"p_from": {
 				"type": "string",
