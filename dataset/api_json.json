@@ -1,0 +1,40 @@
+{
+	"name": "api_json",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "DataLake_ls",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"p_date": {
+				"type": "string"
+			},
+			"P_from": {
+				"type": "string"
+			},
+			"p_to": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@concat('from=',dataset().P_from,'_to=',dataset().p_to, '.json')",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@concat('currency/date',dataset().p_date)",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "bronze",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {}
+	}
+}

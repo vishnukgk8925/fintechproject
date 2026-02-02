@@ -1,0 +1,12 @@
+{
+	"name": "Azure_sql",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Fintech_Sql_ls",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}

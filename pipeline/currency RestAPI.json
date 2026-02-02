@@ -1,0 +1,195 @@
+{
+	"name": "currency RestAPI",
+	"properties": {
+		"activities": [
+			{
+				"name": "Loop controller through data",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "v_currentdate",
+					"value": {
+						"value": "@pipeline().parameters.p_startdate",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Until",
+				"type": "Until",
+				"dependsOn": [
+					{
+						"activity": "Loop controller through data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greater(variables('v_currentdate'), pipeline().parameters.p_enddate)\n",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "API call to datalake",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "RestSource",
+									"httpRequestTimeout": "00:01:40",
+									"requestInterval": "00.00:00:00.010",
+									"requestMethod": "GET",
+									"paginationRules": {
+										"supportRFC5988": "true"
+									}
+								},
+								"sink": {
+									"type": "JsonSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "JsonWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "RestResource",
+									"type": "DatasetReference",
+									"parameters": {
+										"p_date": {
+											"value": "@variables('v_currentdate')",
+											"type": "Expression"
+										},
+										"p_from": {
+											"value": "@pipeline().parameters.p_from",
+											"type": "Expression"
+										},
+										"p_to": {
+											"value": "@pipeline().parameters.p_to",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "api_json",
+									"type": "DatasetReference",
+									"parameters": {
+										"p_date": {
+											"value": "@variables('v_currentdate')",
+											"type": "Expression"
+										},
+										"P_from": {
+											"value": "@pipeline().parameters.p_from",
+											"type": "Expression"
+										},
+										"p_to": {
+											"value": "@pipeline().parameters.p_to",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "increment_date",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "API call to datalake",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "v_nextdate",
+								"value": {
+									"value": "@formatDateTime(addDays(variables('v_currentdate'), 1),'yyyy-MM-dd')",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "update_currentdate",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "increment_date",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "v_currentdate",
+								"value": {
+									"value": "@variables('v_nextdate')",
+									"type": "Expression"
+								}
+							}
+						}
+					],
+					"timeout": "0.12:00:00"
+				}
+			}
+		],
+		"parameters": {
+			"p_startdate": {
+				"type": "string",
+				"defaultValue": "2025-06-01"
+			},
+			"p_enddate": {
+				"type": "string",
+				"defaultValue": "2026-01-01"
+			},
+			"p_from": {
+				"type": "string",
+				"defaultValue": "USD"
+			},
+			"p_to": {
+				"type": "string",
+				"defaultValue": "INR"
+			}
+		},
+		"variables": {
+			"v_currentdate": {
+				"type": "String"
+			},
+			"v_nextdate": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}

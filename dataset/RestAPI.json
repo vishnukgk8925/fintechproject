@@ -1,0 +1,8 @@
+{
+	"name": "RestAPI",
+	"properties": {
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	}
+}

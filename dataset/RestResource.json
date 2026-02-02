@@ -1,0 +1,29 @@
+{
+	"name": "RestResource",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "RestService1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"p_date": {
+				"type": "string"
+			},
+			"p_from": {
+				"type": "string"
+			},
+			"p_to": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@concat(dataset().p_date, '?from=', dataset().p_from, '&to=', dataset().p_to)\n",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	}
+}
